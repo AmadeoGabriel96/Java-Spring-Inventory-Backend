@@ -21,7 +21,4 @@ public class InvoiceDetails {
     @JoinColumn(name = "invoice_id", nullable = false)
     private Invoice invoice;
 
-    @OneToMany(mappedBy = "invoiceDetails", cascade = CascadeType.ALL)
-    private List<Product> products = new ArrayList<>();
-
 }
