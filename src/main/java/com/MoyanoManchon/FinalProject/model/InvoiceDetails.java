@@ -21,4 +21,8 @@ public class InvoiceDetails {
     @JoinColumn(name = "invoice_id", nullable = false)
     private Invoice invoice;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
+
 }
