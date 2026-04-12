@@ -15,12 +15,12 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-@Transactional
 public class ClientService {
 
     @Autowired
     private ClientRepository clientRepository;
-  
+
+    @Transactional
     public Client create(Client newClient) throws AlreadyExistException {
 
         Optional<Client> clientOp = this.clientRepository.findByDocNumber(newClient.getDocNumber());
@@ -33,6 +33,7 @@ public class ClientService {
 
     }
 
+    @Transactional
     public Client update(Client newClient, Long id) throws Exception {
 
         if (id <= 0){
