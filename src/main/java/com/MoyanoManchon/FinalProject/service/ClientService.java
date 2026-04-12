@@ -15,18 +15,18 @@ import java.util.Optional;
 
 @Slf4j
 @Service
+@Transactional
 public class ClientService {
 
     @Autowired
     private ClientRepository clientRepository;
-
+  
     public Client create(Client newClient) throws AlreadyExistException {
 
         Optional<Client> clientOp = this.clientRepository.findByDocNumber(newClient.getDocNumber());
 
-        if (clientOp.isPresent()){
-            log.info("El producto que desea agregar ya existe" + newClient);
-            throw new AlreadyExistException("El producto que desea agregar ya existe");
+        if (newClient.getDocNumber() == null || !newClient.getDocNumber().matches("\\d+")) {
+            throw new Exception("El DNI debe contener solo números");
         }else{
             return this.clientRepository.save(newClient);
         }
@@ -39,19 +39,18 @@ public class ClientService {
             throw new Exception("El id no es valido");
         }
 
-        Optional<Client> clientOp = this.clientRepository.findById(newClient.getId());
+        Optional<Client> clientOp = this.clientRepository.findById(id);
 
         if(clientOp.isEmpty()){
-            log.info("El producto ya existe enla base de datos" +  newClient);
-            throw new NotFoundException("El producto ya existe enla base de datos");
+            log.info("El cliente no existe" +  newClient);
+            throw new NotFoundException("El cliente no existe");
         } else{
             Client clientBd = clientOp.get();
-            clientBd.setId(newClient.getId());
             clientBd.setName(newClient.getName());
             clientBd.setLastname(newClient.getLastname());
             clientBd.setDocnumber(newClient.getDocnumber());
 
-            return this.clientRepository.save(newClient);
+            return this.clientRepository.save(clientBd);
         }
 
     }
@@ -64,9 +63,8 @@ public class ClientService {
 
         Optional<Client> clientOp = this.clientRepository.findById(id);
 
-        if (clientOp.isPresent()){
-            log.info("El cliente que intenta agregar ya existe en la base de datos" + id);
-            throw new NotFoundException("El cliente que intenta agregar ya existe en la base de datos");
+        if (clientOp.isEmpty()){
+            throw new NotFoundException("El cliente no existe");
         } else{
             return clientOp.get();
         }
