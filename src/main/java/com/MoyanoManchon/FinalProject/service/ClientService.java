@@ -22,7 +22,7 @@ public class ClientService {
 
     public Client create(Client newClient) throws AlreadyExistException {
 
-        Optional<Client> clientOp = this.clientRepository.findById(newClient.getId());
+        Optional<Client> clientOp = this.clientRepository.findByDocNumber(newClient.getDocNumber());
 
         if (clientOp.isPresent()){
             log.info("El producto que desea agregar ya existe" + newClient);
