@@ -30,6 +30,10 @@ public class ClientService {
         if (newClient.getName() == null || newClient.getName().trim().isEmpty()) {
             throw new Exception("El nombre es obligatorio");
         }
+
+        if (newClient.getLastname() == null || newClient.getLastname().trim().isEmpty()) {
+            throw new Exception("El apellido es obligatorio");
+        }
         
         Optional<Client> clientOp = this.clientRepository.findByDocNumber(newClient.getDocNumber());
         
