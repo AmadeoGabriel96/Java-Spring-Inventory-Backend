@@ -37,7 +37,7 @@ public class InvoiceService {
         }
         Client client = clientRepository.findById(newInvoice.getClient().getId()).orElseThrow(() -> new Exception("El cliente no existe"));
         newInvoice.setClient(client);
-        if (newInvoice.getDetails() == null || newInvoice.getDetails().isEmpty()) {
+        if (newInvoice.getDetails() == null || newInvoice.getInvoiceDetailsList().isEmpty()) {
             throw new Exception("La factura debe tener al menos un producto");
         }
         double total = 0;
