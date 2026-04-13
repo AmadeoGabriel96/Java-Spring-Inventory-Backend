@@ -1,5 +1,6 @@
 package com.MoyanoManchon.FinalProject.service;
 
+import org.springframework.transaction.annotation.Transactional;
 import com.MoyanoManchon.FinalProject.exception.AlreadyExistException;
 import com.MoyanoManchon.FinalProject.exception.NotFoundException;
 import com.MoyanoManchon.FinalProject.model.Client;
@@ -21,16 +22,23 @@ public class ClientService {
     private ClientRepository clientRepository;
 
     @Transactional
-    public Client create(Client newClient) throws AlreadyExistException {
-
-        Optional<Client> clientOp = this.clientRepository.findByDocNumber(newClient.getDocNumber());
+    public Client create(Client newClient) throws Exception {
 
         if (newClient.getDocNumber() == null || !newClient.getDocNumber().matches("\\d+")) {
             throw new Exception("El DNI debe contener solo números");
-        }else{
-            return this.clientRepository.save(newClient);
+        }
+        if (newClient.getName() == null || newClient.getName().trim().isEmpty()) {
+            throw new Exception("El nombre es obligatorio");
+        }
+        
+        Optional<Client> clientOp = this.clientRepository.findByDocNumber(newClient.getDocNumber());
+        
+        if (clientOp.isPresent()) {
+            throw new Exception("Ya existe un cliente con DNI " + newClient.getDocNumber());
         }
 
+        return this.clientRepository.save(newClient);
+        
     }
 
     @Transactional
@@ -43,7 +51,7 @@ public class ClientService {
         Optional<Client> clientOp = this.clientRepository.findById(id);
 
         if(clientOp.isEmpty()){
-            log.info("El cliente no existe" +  newClient);
+            log.info("El cliente no existe: " + newClient);
             throw new NotFoundException("El cliente no existe");
         } else{
             Client clientBd = clientOp.get();
