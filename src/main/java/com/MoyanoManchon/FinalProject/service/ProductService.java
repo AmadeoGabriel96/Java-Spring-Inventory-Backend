@@ -34,7 +34,7 @@ public class ProductService {
         Optional<Product> productOp = this.productRepository.findByCode(newProduct.getCode());
 
         if (productOp.isPresent()){
-            log.info("El producto que desea agregar ya existe" + newProduct);
+            log.info("El producto que desea agregar ya existe: " + newProduct);
             throw new AlreadyExistException("El producto que desea agregar ya existe");
         }else{
             return this.productRepository.save(newProduct);
