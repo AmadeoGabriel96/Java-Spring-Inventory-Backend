@@ -41,7 +41,7 @@ public class InvoiceService {
             throw new Exception("La factura debe tener al menos un producto");
         }
         double total = 0;
-        for (InvoiceDetails detail : newInvoice.getDetails()) {
+        for (InvoiceDetails detail : newInvoice.getInvoiceDetailsList()) {
             if (detail.getProduct() == null || detail.getProduct().getId() == null) {
                 throw new Exception("El producto es obligatorio en cada línea");
             }
