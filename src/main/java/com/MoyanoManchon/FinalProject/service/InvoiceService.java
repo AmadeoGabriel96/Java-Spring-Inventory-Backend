@@ -1,55 +1,67 @@
 package com.MoyanoManchon.FinalProject.service;
 
-import com.MoyanoManchon.FinalProject.exception.AlreadyExistException;
 import com.MoyanoManchon.FinalProject.exception.NotFoundException;
+import com.MoyanoManchon.FinalProject.model.Client;
 import com.MoyanoManchon.FinalProject.model.Invoice;
+import com.MoyanoManchon.FinalProject.model.InvoiceDetails;
+import com.MoyanoManchon.FinalProject.model.Product;
+import com.MoyanoManchon.FinalProject.repository.ClientRepository; 
 import com.MoyanoManchon.FinalProject.repository.InvoiceRepository;
+import com.MoyanoManchon.FinalProject.repository.ProductRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional; 
 
 import java.util.List;
 import java.util.Optional;
 
 @Slf4j
 @Service
+    
 public class InvoiceService {
 
     @Autowired
     private InvoiceRepository invoiceRepository;
 
-    public Invoice create(Invoice newInvoice) throws AlreadyExistException {
+    @Autowired 
+    private ClientRepository clientRepository;
 
-        Optional<Invoice> invoiceOp = this.invoiceRepository.findById(newInvoice.getId());
-
-        if (invoiceOp.isPresent()){
-            log.info("La factura ya existe" + newInvoice);
-            throw new AlreadyExistException("La factura ya existe");
-        }else{
-            return this.invoiceRepository.save(newInvoice);
+    @Autowired 
+    private ProductRepository productRepository;
+    
+    @Transactional
+    public Invoice create(Invoice newInvoice) throws Exception {
+        if (newInvoice.getClient() == null || newInvoice.getClient().getId() == null) {
+            throw new Exception("El cliente es obligatorio");
         }
-
-    }
-
-    public Invoice update(Invoice newInvoice, Long id) throws Exception{
-
-        if (id <= 0){
-            throw new Exception("El id no es valido");
+        Client client = clientRepository.findById(newInvoice.getClient().getId()).orElseThrow(() -> new Exception("El cliente no existe"));
+        newInvoice.setClient(client);
+        if (newInvoice.getDetails() == null || newInvoice.getDetails().isEmpty()) {
+            throw new Exception("La factura debe tener al menos un producto");
         }
-
-        Optional<Invoice> invoiceOp = this.invoiceRepository.findById(newInvoice.getId());
-
-        if(invoiceOp.isEmpty()){
-            log.info("La factura ya existe en la base de datos" +  newInvoice);
-            throw new NotFoundException("La factura ya existe en la base de datos");
-        } else{
-            Invoice invoiceBd = invoiceOp.get();
-            invoiceBd.setId(newInvoice.getId());
-            invoiceBd.setTotal(newInvoice.getTotal());
-
-            return this.invoiceRepository.save(newInvoice);
+        double total = 0;
+        for (InvoiceDetails detail : newInvoice.getDetails()) {
+            if (detail.getProduct() == null || detail.getProduct().getId() == null) {
+                throw new Exception("El producto es obligatorio en cada línea");
+            }
+            if (detail.getAmount() <= 0) {
+                throw new Exception("La cantidad debe ser mayor a 0");
+            }
+            Product product = productRepository.findById(detail.getProduct().getId()).orElseThrow(() -> new Exception("El producto no existe"));
+            if (product.getStock() < detail.getAmount()) {
+                throw new Exception("Stock insuficiente para: " + product.getDescription() + ". Disponible: " + product.getStock() + ", solicitado: " + detail.getAmount());
+            }
+            product.setStock(product.getStock() - detail.getAmount());
+            productRepository.save(product);
+            detail.setProduct(product);
+            detail.setPrice(product.getPrice()); // Precio actual del producto
+            detail.setInvoice(newInvoice); // Enlace bidireccional
+            total += detail.getAmount() * product.getPrice();
         }
-
+        newInvoice.setTotal(total);
+        return invoiceRepository.save(newInvoice);
+        
     }
 
     public Invoice findById(Long id) throws Exception{
@@ -60,9 +72,8 @@ public class InvoiceService {
 
         Optional<Invoice> invoiceOp = this.invoiceRepository.findById(id);
 
-        if (invoiceOp.isPresent()){
-            log.info("La factura ya existe en la base de datos" + id);
-            throw new NotFoundException("La factura ya existe en la base de datos");
+        if (invoiceOp.isEmpty()){
+            throw new NotFoundException("La factura no existe");
         } else{
             return invoiceOp.get();
         }
