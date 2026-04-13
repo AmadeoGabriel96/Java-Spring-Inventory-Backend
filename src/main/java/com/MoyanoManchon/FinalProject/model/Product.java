@@ -1,7 +1,8 @@
 package com.MoyanoManchon.FinalProject.model;
 
 import lombok.Data;
-import javax.persistence.*;
+import jakarta.persistence.*;
+import jakarta.validation.*;
 
 @Data
 @Entity
