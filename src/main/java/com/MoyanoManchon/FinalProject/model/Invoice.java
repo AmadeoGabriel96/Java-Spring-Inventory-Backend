@@ -17,19 +17,16 @@ public class Invoice {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
+    @CreationTimestamp
     private Date createdAt;
     private double total;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Client client;
 
-    @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL)
-    private List<InvoiceDetails> invoiceDetailsList = new ArrayList<>();
-
     @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
-
-    @CreationTimestamp
-    private Date createdAt;
+    private List<InvoiceDetails> invoiceDetailsList = new ArrayList<>();
 
 }
 
