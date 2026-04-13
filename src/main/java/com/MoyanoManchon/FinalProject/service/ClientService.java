@@ -24,7 +24,7 @@ public class ClientService {
     @Transactional
     public Client create(Client newClient) throws Exception {
 
-        if (newClient.getDocNumber() == null || !newClient.getDocNumber().matches("\\d+")) {
+        if (newClient.getDocNumber() == null || !newClient.getDocnumber().matches("\\d+")) {
             throw new Exception("El DNI debe contener solo números");
         }
         if (newClient.getName() == null || newClient.getName().trim().isEmpty()) {
@@ -35,10 +35,10 @@ public class ClientService {
             throw new Exception("El apellido es obligatorio");
         }
         
-        Optional<Client> clientOp = this.clientRepository.findByDocNumber(newClient.getDocNumber());
+        Optional<Client> clientOp = this.clientRepository.findByDocNumber(newClient.getDocnumber());
         
         if (clientOp.isPresent()) {
-            throw new Exception("Ya existe un cliente con DNI " + newClient.getDocNumber());
+            throw new Exception("Ya existe un cliente con DNI " + newClient.getDocnumber());
         }
 
         return this.clientRepository.save(newClient);
