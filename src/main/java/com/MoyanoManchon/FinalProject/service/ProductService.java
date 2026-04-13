@@ -20,7 +20,7 @@ public class ProductService {
     private ProductRepository productRepository;
 
     @Transactional
-    public Product create(Product newProduct) throws AlreadyExistException {
+    public Product create(Product newProduct) throws Exception {
 
         if (newProduct.getCode() == null || newProduct.getCode().trim().isEmpty()) {
             throw new Exception("El código es obligatorio");
