@@ -64,22 +64,6 @@ public class InvoiceService {
         
     }
 
-    public Invoice findById(Long id) throws Exception{
-
-        if (id <= 0){
-            throw new Exception("El id no es valido");
-        }
-
-        Optional<Invoice> invoiceOp = this.invoiceRepository.findById(id);
-
-        if (invoiceOp.isEmpty()){
-            throw new NotFoundException("La factura no existe");
-        } else{
-            return invoiceOp.get();
-        }
-
-    }
-
     @Transactional
     public Invoice update(Invoice newInvoice, Long id) throws Exception {
 
@@ -98,6 +82,22 @@ public class InvoiceService {
             invoiceBd.setInvoiceDetailsList(newInvoice.getInvoiceDetailsList());
 
             return this.invoiceRepository.save(invoiceBd);
+        }
+
+    }
+
+    public Invoice findById(Long id) throws Exception{
+
+        if (id <= 0){
+            throw new Exception("El id no es valido");
+        }
+
+        Optional<Invoice> invoiceOp = this.invoiceRepository.findById(id);
+
+        if (invoiceOp.isEmpty()){
+            throw new NotFoundException("La factura no existe");
+        } else{
+            return invoiceOp.get();
         }
 
     }
