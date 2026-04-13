@@ -22,6 +22,6 @@ public class Client {
     private String docnumber;
 
     @OneToMany(mappedBy = "client")
-    private List<Invoice> invoices = new ArrayList<>();;
+    private List<Invoice> invoices = new ArrayList<>();
 
 }
