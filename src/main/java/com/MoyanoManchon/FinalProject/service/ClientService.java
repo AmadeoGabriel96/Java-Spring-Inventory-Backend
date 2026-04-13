@@ -24,7 +24,7 @@ public class ClientService {
     @Transactional
     public Client create(Client newClient) throws Exception {
 
-        if (newClient.getDocNumber() == null || !newClient.getDocnumber().matches("\\d+")) {
+        if (newClient.getDocnumber() == null || !newClient.getDocnumber().matches("\\d+")) {
             throw new Exception("El DNI debe contener solo números");
         }
         if (newClient.getName() == null || newClient.getName().trim().isEmpty()) {
